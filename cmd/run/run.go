@@ -25,16 +25,16 @@ func run(c *cli.Context) error {
 		},
 	}
 
-	clearCommands := b.advertiseCommands()
-	defer clearCommands()
+	b.advertiseCommands()
+	defer b.clearCommands()
 
 	// catch ctrl + c
 	var trap = make(chan os.Signal, 1)
 	signal.Notify(trap, os.Interrupt)
 	go func() {
 		for _ = range trap {
-			b.log_debug("Received interrupt signal. Clearing commands and exiting...")
-			clearCommands()
+			b.log_debug("Received interrupt signal")
+			b.clearCommands()
 			os.Exit(0)
 		}
 	}()

@@ -5,7 +5,7 @@ import (
 	"samhofi.us/x/keybase/v2/types/chat1"
 )
 
-func (b *bot) advertiseCommands() func() {
+func (b *bot) advertiseCommands() {
 	b.log_debug("Advertising commands")
 	b.k.ClearCommands()
 	opts := keybase.AdvertiseCommandsOptions{
@@ -27,9 +27,9 @@ func (b *bot) advertiseCommands() func() {
 		},
 	}
 	b.k.AdvertiseCommands(opts)
+}
 
-	return func() {
-		b.log_debug("Clearing commands")
-		b.k.ClearCommands()
-	}
+func (b *bot) clearCommands() {
+	b.log_debug("Clearing commands")
+	b.k.ClearCommands()
 }
