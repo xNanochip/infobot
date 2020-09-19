@@ -20,6 +20,21 @@ func Run(args []string, stdout io.Writer) error {
 	app.Writer = stdout
 	app.HideVersion = false
 
+	app.Flags = []cli.Flag{
+		&cli.BoolFlag{
+			Name:    "debug",
+			Aliases: []string{"d"},
+			EnvVars: []string{"INFOBOT_DEBUG"},
+			Usage:   "Enable debug mode",
+		},
+		&cli.PathFlag{
+			Name:    "home",
+			Aliases: []string{"H"},
+			EnvVars: []string{"INFOBOT_HOME"},
+			Usage:   "Set an alternate home directory for the Keybase client",
+		},
+	}
+
 	app.Commands = []*cli.Command{
 		&run.Command,
 	}
