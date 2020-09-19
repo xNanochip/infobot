@@ -1,6 +1,9 @@
 package run
 
 import (
+	"os"
+	"os/signal"
+
 	"github.com/urfave/cli/v2"
 	"samhofi.us/x/keybase/v2"
 )
@@ -21,6 +24,20 @@ func run(c *cli.Context) error {
 			stderr: c.App.ErrWriter,
 		},
 	}
+
+	clearCommands := b.advertiseCommands()
+	defer clearCommands()
+
+	// catch ctrl + c
+	var trap = make(chan os.Signal, 1)
+	signal.Notify(trap, os.Interrupt)
+	go func() {
+		for _ = range trap {
+			b.log_debug("Received interrupt signal. Clearing commands and exiting...")
+			clearCommands()
+			os.Exit(0)
+		}
+	}()
 
 	b.registerHandlers()
 	b.log_info("Running as user %s", b.k.Username)

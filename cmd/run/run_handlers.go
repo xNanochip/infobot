@@ -10,7 +10,6 @@ import (
 
 func (b *bot) registerHandlers() {
 	b.log_debug("Registering handlers")
-	defer b.log_debug("Done registering handlers")
 
 	var (
 		chat   = b.chatHandler
