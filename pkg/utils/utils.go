@@ -8,6 +8,16 @@ import (
 	"samhofi.us/x/keybase/v2/types/chat1"
 )
 
+// StringInSlice checks whether a given string is present in a given slice of strings
+func StringInSlice(s string, slice []string) bool {
+	for _, item := range slice {
+		if item == s {
+			return true
+		}
+	}
+	return false
+}
+
 // ChannelToString takes a Keybase ChatChannel and returns a string representation of it
 func ChannelToString(channel chat1.ChatChannel) string {
 	return ""
