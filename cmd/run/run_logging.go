@@ -4,11 +4,27 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	"samhofi.us/x/infobot/pkg/utils"
 )
 
 func (b *bot) write_log(level logLevel, s string, a ...interface{}) {
-	var currentTime = strings.ToUpper(time.Now().UTC().Format("02Jan2006 15:04:05"))
-	a = append([]interface{}{currentTime, level}, a...)
+	var (
+		now        = time.Now().UTC()
+		timeFormat = "02Jan2006 15:04:05"
+	)
+
+	if b.config.json {
+		item := logItem{
+			Time:       now.Unix(),
+			LogLevel:   level.String(),
+			LogMessage: fmt.Sprintf(s, a...),
+		}
+		fmt.Fprintln(b.config.stdout, utils.ToJson(item))
+		return
+	}
+
+	a = append([]interface{}{strings.ToUpper(now.Format(timeFormat)), level}, a...)
 	fmt.Fprintf(b.config.stdout, "[%v] %v: "+s+"\n", a...)
 }
 

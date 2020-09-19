@@ -33,6 +33,12 @@ func Run(args []string, stdout io.Writer) error {
 			EnvVars: []string{"INFOBOT_HOME"},
 			Usage:   "Set an alternate home directory for the Keybase client",
 		},
+		&cli.BoolFlag{
+			Name:    "json",
+			Aliases: []string{"j"},
+			EnvVars: []string{"INFOBOT_JSON"},
+			Usage:   "Output logs in JSON format",
+		},
 	}
 
 	app.Commands = []*cli.Command{

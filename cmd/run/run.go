@@ -20,6 +20,7 @@ func run(c *cli.Context) error {
 		k: keybase.New(keybase.SetHomePath(c.Path("home"))),
 		config: botConfig{
 			debug:  c.Bool("debug"),
+			json:   c.Bool("json"),
 			stdout: c.App.Writer,
 			stderr: c.App.ErrWriter,
 		},

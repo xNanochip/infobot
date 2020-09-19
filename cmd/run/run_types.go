@@ -16,6 +16,7 @@ type bot struct {
 
 type botConfig struct {
 	debug        bool             // Whether to enable debugging
+	json         bool             // Whether to output logs in JSON format
 	logConv      *chat1.ConvIDStr // ConversationID to send log messages to. Set to nil to disable
 	settingsTeam *string          // Team to use for storing team settings. Set to nil to use implicit self-team (the bot user's conversation with itself)
 	stdout       io.Writer
@@ -47,4 +48,10 @@ var logLevelStringRevMap = map[logLevel]string{
 
 func (l logLevel) String() string {
 	return logLevelStringRevMap[l]
+}
+
+type logItem struct {
+	Time       int64  `json:"time"`
+	LogLevel   string `json:"log_level"`
+	LogMessage string `json:"log_message"`
 }
