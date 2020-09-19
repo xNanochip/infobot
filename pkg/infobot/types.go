@@ -53,17 +53,17 @@ func NewTeamSettings() *TeamSettings {
 
 // Info holds the information related to a particular key/value pair
 type Info struct {
-	Key         string    `json:"key"`
-	Value       string    `json:"value"`
-	CreatedBy   string    `json:"created_by"`
-	CreatedTime time.Time `json:"created_time"`
-	Edits       []Edit    `json:"edits"`
+	Key         string `json:"key"`
+	Value       string `json:"value"`
+	CreatedBy   string `json:"created_by"`
+	CreatedTime int64  `json:"created_time"`
+	Edits       []Edit `json:"edits"`
 	revision    int
 }
 
 // NewInfo returns a new Info struct
 func NewInfo(Key, Value, CreatedBy string) *Info {
-	var CreatedTime = time.Now()
+	var CreatedTime = time.Now().UTC().Unix()
 
 	return &Info{
 		Key:         Key,
@@ -83,14 +83,14 @@ func NewInfo(Key, Value, CreatedBy string) *Info {
 
 // Edit holds one edit record for an Info
 type Edit struct {
-	EditedBy  string    `json:"edited_by"`
-	Timestamp time.Time `json:"timestamp"`
-	NewValue  string    `json:"new_value"`
+	EditedBy  string `json:"edited_by"`
+	Timestamp int64  `json:"timestamp"`
+	NewValue  string `json:"new_value"`
 }
 
 // NewEdit returns a new Edit struct
 func NewEdit(EditedBy, NewValue string) *Edit {
-	var Timestamp = time.Now()
+	var Timestamp = time.Now().UTC().Unix()
 
 	return &Edit{
 		EditedBy:  EditedBy,
