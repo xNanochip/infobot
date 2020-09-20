@@ -102,4 +102,5 @@ func (b *bot) walletHandler(p stellar1.PaymentDetailsLocal) {
 }
 
 func (b *bot) errorHandler(e error) {
+	b.logError("Error: %v", e)
 }
