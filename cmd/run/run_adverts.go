@@ -6,7 +6,7 @@ import (
 )
 
 func (b *bot) advertiseCommands() {
-	b.log_debug("Advertising commands")
+	b.logDebug("Advertising commands")
 	b.k.ClearCommands()
 	opts := keybase.AdvertiseCommandsOptions{
 		Alias: "InfoBot",
@@ -48,6 +48,10 @@ func (b *bot) advertiseCommands() {
 						Name:        "info settings",
 						Description: "Read team settings",
 					},
+					{
+						Name:        "info keys",
+						Description: "List all available keys",
+					},
 				},
 			},
 		},
@@ -56,6 +60,6 @@ func (b *bot) advertiseCommands() {
 }
 
 func (b *bot) clearCommands() {
-	b.log_debug("Clearing commands")
+	b.logDebug("Clearing commands")
 	b.k.ClearCommands()
 }

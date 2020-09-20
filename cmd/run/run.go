@@ -34,14 +34,14 @@ func run(c *cli.Context) error {
 	signal.Notify(trap, os.Interrupt)
 	go func() {
 		for _ = range trap {
-			b.log_debug("Received interrupt signal")
+			b.logDebug("Received interrupt signal")
 			b.clearCommands()
 			os.Exit(0)
 		}
 	}()
 
 	b.registerHandlers()
-	b.log_info("Running as user %s", b.k.Username)
+	b.logInfo("Running as user %s", b.k.Username)
 	b.k.Run(b.handlers, &b.opts)
 	return nil
 }

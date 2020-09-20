@@ -52,6 +52,7 @@ func (l logLevel) String() string {
 
 type logItem struct {
 	Time       int64  `json:"time"`
+	FuncName   string `json:"func_name"`
 	LogLevel   string `json:"log_level"`
 	LogMessage string `json:"log_message"`
 }

@@ -12,7 +12,7 @@ import (
 )
 
 func (b *bot) registerHandlers() {
-	b.log_debug("Registering handlers")
+	b.logDebug("Registering handlers")
 
 	var (
 		chat   = b.chatHandler
@@ -45,7 +45,7 @@ func (b *bot) chatHandler(m chat1.MsgSummary) {
 			// fetch team's settings for the bot
 			settings, err := infobot.FetchTeamSettings(b.k, teamName)
 			if err != nil {
-				b.log_error("Unable to fetch team settings for team %s. -- %v", teamName, err)
+				b.logError("Unable to fetch team settings for team %s. -- %v", teamName, err)
 				b.k.ReplyByConvID(convID, m.Id, "Unable to fetch team settings")
 				return
 			}
@@ -73,7 +73,7 @@ func (b *bot) chatHandler(m chat1.MsgSummary) {
 			// make sure key doesn't already exist
 			keys, err := infobot.GetKeys(b.k, teamName)
 			if err != nil {
-				b.log_error("Unable to fetch keys for team %s. -- %v", teamName, err)
+				b.logError("Unable to fetch keys for team %s. -- %v", teamName, err)
 				b.k.ReplyByConvID(convID, m.Id, "Unable to fetch existing keys")
 				return
 			}
@@ -86,7 +86,7 @@ func (b *bot) chatHandler(m chat1.MsgSummary) {
 			info := infobot.NewInfo(key, value, userName)
 			err = infobot.WriteInfo(b.k, teamName, *info)
 			if err != nil {
-				b.log_error("Unable to write new key to team %s. -- %v", teamName, err)
+				b.logError("Unable to write new key to team %s. -- %v", teamName, err)
 				b.k.ReplyByConvID(convID, m.Id, "Failed to write new key to kvstore: %v", err)
 				return
 			}
@@ -94,7 +94,7 @@ func (b *bot) chatHandler(m chat1.MsgSummary) {
 			// react to the command message to let them know it was successful
 			_, err = b.k.ReactByConvID(convID, m.Id, ":heavy_check_mark:")
 			if err != nil {
-				b.log_error("Error sending reaction: %v", err)
+				b.logError("Error sending reaction: %v", err)
 			}
 			return
 		}
@@ -102,7 +102,7 @@ func (b *bot) chatHandler(m chat1.MsgSummary) {
 			// fetch team's settings for the bot
 			settings, err := infobot.FetchTeamSettings(b.k, teamName)
 			if err != nil {
-				b.log_error("Unable to fetch team settings for team %s. -- %v", teamName, err)
+				b.logError("Unable to fetch team settings for team %s. -- %v", teamName, err)
 				b.k.ReplyByConvID(convID, m.Id, "Unable to fetch team settings")
 				return
 			}
@@ -130,7 +130,7 @@ func (b *bot) chatHandler(m chat1.MsgSummary) {
 			// make sure key exists
 			keys, err := infobot.GetKeys(b.k, teamName)
 			if err != nil {
-				b.log_error("Unable to fetch keys for team %s. -- %v", teamName, err)
+				b.logError("Unable to fetch keys for team %s. -- %v", teamName, err)
 				b.k.ReplyByConvID(convID, m.Id, "Unable to fetch existing keys")
 				return
 			}
@@ -142,7 +142,7 @@ func (b *bot) chatHandler(m chat1.MsgSummary) {
 			// fetch existing key info from the team's kvstore
 			info, err := infobot.FetchKey(b.k, teamName, key)
 			if err != nil {
-				b.log_error("Unable to fetch key for team %s. -- %v", teamName, err)
+				b.logError("Unable to fetch key for team %s. -- %v", teamName, err)
 				b.k.ReplyByConvID(convID, m.Id, "Unable to fetch key")
 				return
 			}
@@ -155,7 +155,7 @@ func (b *bot) chatHandler(m chat1.MsgSummary) {
 			// save edited key
 			err = infobot.WriteInfo(b.k, teamName, info)
 			if err != nil {
-				b.log_error("Unable to write new key to team %s. -- %v", teamName, err)
+				b.logError("Unable to write new key to team %s. -- %v", teamName, err)
 				b.k.ReplyByConvID(convID, m.Id, "Failed to write new key to kvstore: %v", err)
 				return
 			}
@@ -163,7 +163,7 @@ func (b *bot) chatHandler(m chat1.MsgSummary) {
 			// react to the command message to let them know it was successful
 			_, err = b.k.ReactByConvID(convID, m.Id, ":heavy_check_mark:")
 			if err != nil {
-				b.log_error("Error sending reaction: %v", err)
+				b.logError("Error sending reaction: %v", err)
 			}
 			return
 		}
@@ -171,7 +171,7 @@ func (b *bot) chatHandler(m chat1.MsgSummary) {
 			// fetch team's settings for the bot
 			settings, err := infobot.FetchTeamSettings(b.k, teamName)
 			if err != nil {
-				b.log_error("Unable to fetch team settings for team %s. -- %v", teamName, err)
+				b.logError("Unable to fetch team settings for team %s. -- %v", teamName, err)
 				b.k.ReplyByConvID(convID, m.Id, "Unable to fetch team settings")
 				return
 			}
@@ -194,7 +194,7 @@ func (b *bot) chatHandler(m chat1.MsgSummary) {
 			// make sure key exists
 			keys, err := infobot.GetKeys(b.k, teamName)
 			if err != nil {
-				b.log_error("Unable to fetch keys for team %s. -- %v", teamName, err)
+				b.logError("Unable to fetch keys for team %s. -- %v", teamName, err)
 				b.k.ReplyByConvID(convID, m.Id, "Unable to fetch existing keys")
 				return
 			}
@@ -206,7 +206,7 @@ func (b *bot) chatHandler(m chat1.MsgSummary) {
 			// fetch existing key info from the team's kvstore
 			info, err := infobot.FetchKey(b.k, teamName, key)
 			if err != nil {
-				b.log_error("Unable to fetch key for team %s. -- %v", teamName, err)
+				b.logError("Unable to fetch key for team %s. -- %v", teamName, err)
 				b.k.ReplyByConvID(convID, m.Id, "Unable to fetch key")
 				return
 			}
@@ -214,7 +214,7 @@ func (b *bot) chatHandler(m chat1.MsgSummary) {
 			// delete key
 			err = infobot.DeleteKey(b.k, teamName, info)
 			if err != nil {
-				b.log_error("Unable to delete key from team %s. -- %v", teamName, err)
+				b.logError("Unable to delete key from team %s. -- %v", teamName, err)
 				b.k.ReplyByConvID(convID, m.Id, "Failed to delete key from kvstore: %v", err)
 				return
 			}
@@ -222,7 +222,7 @@ func (b *bot) chatHandler(m chat1.MsgSummary) {
 			// react to the command message to let them know it was successful
 			_, err = b.k.ReactByConvID(convID, m.Id, ":heavy_check_mark:")
 			if err != nil {
-				b.log_error("Error sending reaction: %v", err)
+				b.logError("Error sending reaction: %v", err)
 			}
 			return
 		}
@@ -239,13 +239,13 @@ func (b *bot) chatHandler(m chat1.MsgSummary) {
 			// fetch key info from the team's kvstore
 			info, err := infobot.FetchKey(b.k, teamName, key)
 			if err != nil {
-				b.log_error("Unable to fetch key for team %s. -- %v", teamName, err)
+				b.logError("Unable to fetch key for team %s. -- %v", teamName, err)
 				b.k.ReplyByConvID(convID, m.Id, "Unable to fetch key")
 				return
 			}
 			_, err = b.k.ReplyByConvID(convID, m.Id, info.Value)
 			if err != nil {
-				b.log_error("Error sending reply: %v", err)
+				b.logError("Error sending reply: %v", err)
 			}
 			return
 		}
@@ -260,14 +260,14 @@ func (b *bot) chatHandler(m chat1.MsgSummary) {
 			// fetch key info from the team's kvstore
 			info, err := infobot.FetchKey(b.k, teamName, key)
 			if err != nil {
-				b.log_error("Unable to fetch key for team %s. -- %v", teamName, err)
+				b.logError("Unable to fetch key for team %s. -- %v", teamName, err)
 				b.k.ReplyByConvID(convID, m.Id, "Unable to fetch key")
 				return
 			}
 
 			_, err = b.k.ReplyByConvID(convID, m.Id, utils.ToJsonPretty(info))
 			if err != nil {
-				b.log_error("Error sending reply: %v", err)
+				b.logError("Error sending reply: %v", err)
 			}
 			return
 		}
@@ -304,7 +304,7 @@ func (b *bot) chatHandler(m chat1.MsgSummary) {
 
 			settings, err := infobot.FetchTeamSettings(b.k, teamName)
 			if err != nil {
-				b.log_error("Unable to fetch team settings for team %s. -- %v", teamName, err)
+				b.logError("Unable to fetch team settings for team %s. -- %v", teamName, err)
 				b.k.ReplyByConvID(convID, m.Id, "Unable to fetch team settings")
 				return
 			}
@@ -338,14 +338,14 @@ func (b *bot) chatHandler(m chat1.MsgSummary) {
 			}
 			err = infobot.WriteTeamSettings(b.k, teamName, settings)
 			if err != nil {
-				b.log_error("Unable to write team settings for team %s. -- %v", teamName, err)
+				b.logError("Unable to write team settings for team %s. -- %v", teamName, err)
 				b.k.ReplyByConvID(convID, m.Id, "Unable to write team settings")
 				return
 			}
 			// react to the command message to let them know it was successful
 			_, err = b.k.ReactByConvID(convID, m.Id, ":heavy_check_mark:")
 			if err != nil {
-				b.log_error("Error sending reaction: %v", err)
+				b.logError("Error sending reaction: %v", err)
 			}
 			return
 		}
@@ -353,14 +353,29 @@ func (b *bot) chatHandler(m chat1.MsgSummary) {
 			// fetch key info from the team's kvstore
 			settings, err := infobot.FetchTeamSettings(b.k, teamName)
 			if err != nil {
-				b.log_error("Unable to fetch settings for team %s. -- %v", teamName, err)
+				b.logError("Unable to fetch settings for team %s. -- %v", teamName, err)
 				b.k.ReplyByConvID(convID, m.Id, "Unable to fetch settings")
 				return
 			}
 
 			_, err = b.k.ReplyByConvID(convID, m.Id, utils.ToJsonPretty(settings))
 			if err != nil {
-				b.log_error("Error sending reply: %v", err)
+				b.logError("Error sending reply: %v", err)
+			}
+			return
+		}
+		if strings.HasPrefix(m.Content.Text.Body, "!info keys") {
+			// fetch key info from the team's kvstore
+			keys, err := infobot.GetKeys(b.k, teamName)
+			if err != nil {
+				b.logError("Unable to fetch keys for team %s. -- %v", teamName, err)
+				b.k.ReplyByConvID(convID, m.Id, "Unable to fetch keys")
+				return
+			}
+
+			_, err = b.k.ReplyByConvID(convID, m.Id, strings.Join(keys, ", "))
+			if err != nil {
+				b.logError("Error sending reply: %v", err)
 			}
 			return
 		}
@@ -369,7 +384,7 @@ func (b *bot) chatHandler(m chat1.MsgSummary) {
 			if key == "" {
 				_, err := b.k.ReplyByConvID(convID, m.Id, "Try @%s <key>", b.k.Username)
 				if err != nil {
-					b.log_error("Error sending reply: %v", err)
+					b.logError("Error sending reply: %v", err)
 				}
 				return
 			}
@@ -377,13 +392,13 @@ func (b *bot) chatHandler(m chat1.MsgSummary) {
 			// fetch key info from the team's kvstore
 			info, err := infobot.FetchKey(b.k, teamName, key)
 			if err != nil {
-				b.log_error("Unable to fetch key for team %s. -- %v", teamName, err)
+				b.logError("Unable to fetch key for team %s. -- %v", teamName, err)
 				b.k.ReplyByConvID(convID, m.Id, "Unable to fetch key")
 				return
 			}
 			_, err = b.k.ReplyByConvID(convID, m.Id, info.Value)
 			if err != nil {
-				b.log_error("Error sending reply: %v", err)
+				b.logError("Error sending reply: %v", err)
 			}
 			return
 		}
