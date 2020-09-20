@@ -9,9 +9,7 @@ import (
 	"samhofi.us/x/keybase/v2"
 )
 
-var (
-	namespacePrefix = "infobot_"
-)
+var namespacePrefix = "infobot_"
 
 // GetKeys returns a slice of all keys for a team
 func GetKeys(kb *keybase.Keybase, teamName string) ([]string, error) {
@@ -30,6 +28,33 @@ func GetKeys(kb *keybase.Keybase, teamName string) ([]string, error) {
 	}
 
 	return res, nil
+}
+
+// StringToTeamSettings takes base64 encoded JSON and returns an unmarshaled TeamSettings
+func StringToTeamSettings(s string) (TeamSettings, error) {
+	var res TeamSettings
+
+	jsonBytes, err := base64.StdEncoding.DecodeString(s)
+	if err != nil {
+		return res, err
+	}
+
+	err = json.Unmarshal(jsonBytes, &res)
+	if err != nil {
+		return res, err
+	}
+
+	return res, nil
+}
+
+// TeamSettingsToString returns a marshaled TeamSettings
+func TeamSettingsToString(t TeamSettings) (string, error) {
+	res, err := json.Marshal(t)
+	if err != nil {
+		return "", err
+	}
+
+	return base64.StdEncoding.EncodeToString(res), nil
 }
 
 // StringToInfo takes base64 encoded JSON and returns an unmarshaled Info
@@ -57,6 +82,54 @@ func InfoToString(i Info) (string, error) {
 	}
 
 	return base64.StdEncoding.EncodeToString(res), nil
+}
+
+// FetchTeamSettings fetches a team's settings from the KVStore and returns it as a TeamSettings
+func FetchTeamSettings(kb *keybase.Keybase, teamName string) (TeamSettings, error) {
+	var res TeamSettings
+
+	key := "settings"
+	b64Key := base64.StdEncoding.EncodeToString([]byte(strings.ToLower(key)))
+	kv, err := kb.KVGet(&teamName, namespacePrefix+"settings", b64Key)
+	if err != nil {
+		return res, err
+	}
+
+	if kv.EntryValue == "" {
+		settings := NewTeamSettings()
+		err := WriteTeamSettings(kb, teamName, *settings)
+		if err != nil {
+			return *settings, err
+		}
+		return *settings, nil
+	}
+
+	res, err = StringToTeamSettings(kv.EntryValue)
+	if err != nil {
+		return res, err
+	}
+	res.revision = kv.Revision
+
+	return res, nil
+}
+
+// WriteTeamSettings writes a team's settings to the KVStore
+func WriteTeamSettings(kb *keybase.Keybase, teamName string, settings TeamSettings) error {
+	var err error
+
+	key := "settings"
+	b64Key := base64.StdEncoding.EncodeToString([]byte(strings.ToLower(key)))
+	teamSettingsString, err := TeamSettingsToString(settings)
+	if err != nil {
+		return err
+	}
+
+	if settings.revision == 0 {
+		_, err = kb.KVPut(&teamName, namespacePrefix+"settings", b64Key, teamSettingsString)
+		return err
+	}
+	_, err = kb.KVPutWithRevision(&teamName, namespacePrefix+"settings", b64Key, teamSettingsString, settings.revision+1)
+	return err
 }
 
 // FetchKey fetches a key from the KVStore and returns it as an Info

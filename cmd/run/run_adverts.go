@@ -15,12 +15,38 @@ func (b *bot) advertiseCommands() {
 				Typ: "public",
 				Commands: []chat1.UserBotCommandInput{
 					{
-						Name:        "ping",
-						Description: "Pings the bot",
+						Name:        "info add",
+						Usage:       "<key> <value>",
+						Description: "Add a new key",
 					},
 					{
-						Name:        "ding",
-						Description: "Pings the bot",
+						Name:        "info edit",
+						Usage:       "<key> <new value>",
+						Description: "Edit a key",
+					},
+					{
+						Name:        "info delete",
+						Usage:       "<key>",
+						Description: "Delete a key",
+					},
+					{
+						Name:        "info read",
+						Usage:       "<key>",
+						Description: "Read a key's value",
+					},
+					{
+						Name:        "info audit",
+						Usage:       "<key>",
+						Description: "Print all info about a key, including its edit history",
+					},
+					{
+						Name:        "info set",
+						Usage:       "<option> <value>",
+						Description: "Modify team settings",
+					},
+					{
+						Name:        "info settings",
+						Description: "Read team settings",
 					},
 				},
 			},

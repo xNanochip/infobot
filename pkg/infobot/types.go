@@ -2,8 +2,6 @@ package infobot
 
 import (
 	"time"
-
-	"samhofi.us/x/keybase/v2/types/chat1"
 )
 
 var (
@@ -11,43 +9,27 @@ var (
 	DefaultGreetingChannel = ""
 )
 
-// Team holds information about a conversation
-type Team struct {
-	Name     string            `json:"name"`
-	ConvIDs  []chat1.ConvIDStr `json:"conv_ids"`
-	Settings TeamSettings      `json:"team_settings"`
-}
-
-// NewTeam returns a new Team struct
-func NewTeam(Name string, ConvIDs ...chat1.ConvIDStr) *Team {
-	var teamSettings = NewTeamSettings()
-
-	return &Team{
-		Name:     Name,
-		ConvIDs:  ConvIDs,
-		Settings: *teamSettings,
-	}
-}
-
 // TeamSettings holds the settings for a team
 type TeamSettings struct {
-	NonAdminCreate  bool   `json:"non_admin_create"`
-	NonAdminEdit    bool   `json:"non_admin_edit"`
-	NonAdminDelete  bool   `json:"non_admin_delete"`
-	GreetingEnabled bool   `json:"greeting_enabled"`
-	GreetingChannel string `json:"greeting_channel"`
-	GreetingKey     string `json:"greeting_key"`
+	NonAdminCreate bool `json:"non_admin_create"`
+	NonAdminEdit   bool `json:"non_admin_edit"`
+	NonAdminDelete bool `json:"non_admin_delete"`
+	//GreetingEnabled bool   `json:"greeting_enabled"`
+	//GreetingChannel string `json:"greeting_channel"`
+	//GreetingKey     string `json:"greeting_key"`
+	revision int
 }
 
 // NewTeamSettings returns a new TeamSettings struct
 func NewTeamSettings() *TeamSettings {
 	return &TeamSettings{
-		NonAdminCreate:  false,
-		NonAdminEdit:    false,
-		NonAdminDelete:  false,
-		GreetingEnabled: false,
-		GreetingChannel: DefaultGreetingChannel,
-		GreetingKey:     DefaultGreetingKey,
+		NonAdminCreate: false,
+		NonAdminEdit:   false,
+		NonAdminDelete: false,
+		//GreetingEnabled: false,
+		//GreetingChannel: DefaultGreetingChannel,
+		//GreetingKey:     DefaultGreetingKey,
+		revision: 0,
 	}
 }
 
