@@ -373,6 +373,14 @@ func (b *bot) chatHandler(m chat1.MsgSummary) {
 				return
 			}
 
+			if len(keys) == 0 {
+				_, err = b.k.ReplyByConvID(convID, m.Id, "There aren't any keys yet")
+				if err != nil {
+					b.logError("Error sending reply: %v", err)
+				}
+				return
+			}
+
 			_, err = b.k.ReplyByConvID(convID, m.Id, strings.Join(keys, ", "))
 			if err != nil {
 				b.logError("Error sending reply: %v", err)
