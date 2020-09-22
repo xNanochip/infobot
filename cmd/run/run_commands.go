@@ -169,7 +169,7 @@ func (b *bot) cmdInfoDelete(m chat1.MsgSummary) error {
 		return fmt.Errorf(errMissingKey)
 	}
 
-	key := strings.Fields(msg)[0]
+	key := msg
 
 	// make sure key exists
 	keys, err := infobot.GetKeys(b.k, teamName)
@@ -216,7 +216,7 @@ func (b *bot) cmdInfoRead(m chat1.MsgSummary) error {
 		return fmt.Errorf(errMissingKey)
 	}
 
-	key := strings.Fields(msg)[0]
+	key := msg
 
 	// fetch key info from the team's kvstore
 	info, err := infobot.FetchKey(b.k, teamName, key)
@@ -242,7 +242,7 @@ func (b *bot) cmdInfoAudit(m chat1.MsgSummary) error {
 	if msg == "" {
 		return fmt.Errorf(errMissingKey)
 	}
-	key := strings.Fields(msg)[0]
+	key := msg
 
 	// fetch key info from the team's kvstore
 	info, err := infobot.FetchKey(b.k, teamName, key)
