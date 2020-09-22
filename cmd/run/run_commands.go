@@ -129,20 +129,8 @@ func (b *bot) cmdInfoEdit(m chat1.MsgSummary) error {
 		return fmt.Errorf(errKeyNotFound)
 	}
 
-	// fetch existing key info from the team's kvstore
-	info, err := infobot.FetchKey(b.k, teamName, key)
-	if err != nil {
-		b.logError("Unable to fetch key for team %s. -- %v", teamName, err)
-		return fmt.Errorf(errFetchingKey)
-	}
-
-	// write a new edit item to the key
-	edit := infobot.NewEdit(userName, value)
-	info.Edits = append(info.Edits, *edit)
-	info.Value = value
-
-	// save edited key
-	err = infobot.WriteInfo(b.k, teamName, info)
+	// edit the key
+	err = infobot.EditKey(b.k, teamName, key, userName, value)
 	if err != nil {
 		b.logError("Unable to write new key to team %s. -- %v", teamName, err)
 		return fmt.Errorf(errFailedWritingKey)

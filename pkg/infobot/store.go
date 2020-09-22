@@ -191,13 +191,13 @@ func WriteNewKey(kb *keybase.Keybase, teamName, key, value, createdBy string) er
 
 // EditKey edits an existing key and saves it to a team
 func EditKey(kb *keybase.Keybase, teamName, key, editedBy, newValue string) error {
-	edit := NewEdit(editedBy, newValue)
+	edit := NewAction(editedBy, ActionEdit, newValue)
 	info, err := FetchKey(kb, teamName, key)
 	if err != nil {
 		return err
 	}
 
-	info.Edits = append(info.Edits, *edit)
+	info.Actions = append(info.Actions, *edit)
 	info.Value = newValue
 
 	return WriteInfo(kb, teamName, info)

@@ -35,11 +35,11 @@ func NewTeamSettings() *TeamSettings {
 
 // Info holds the information related to a particular key/value pair
 type Info struct {
-	Key         string `json:"key"`
-	Value       string `json:"value"`
-	CreatedBy   string `json:"created_by"`
-	CreatedTime int64  `json:"created_time"`
-	Edits       []Edit `json:"edits"`
+	Key         string   `json:"key"`
+	Value       string   `json:"value"`
+	CreatedBy   string   `json:"created_by"`
+	CreatedTime int64    `json:"created_time"`
+	Actions     []Action `json:"actions"`
 	revision    int
 }
 
@@ -52,31 +52,58 @@ func NewInfo(Key, Value, CreatedBy string) *Info {
 		Value:       Value,
 		CreatedBy:   CreatedBy,
 		CreatedTime: CreatedTime,
-		Edits: []Edit{
+		Actions: []Action{
 			{
-				EditedBy:  CreatedBy,
-				Timestamp: CreatedTime,
-				NewValue:  Value,
+				ByUser:     CreatedBy,
+				ActionType: ActionCreate.String(),
+				Timestamp:  CreatedTime,
+				NewValue:   Value,
 			},
 		},
 		revision: 0,
 	}
 }
 
-// Edit holds one edit record for an Info
-type Edit struct {
-	EditedBy  string `json:"edited_by"`
-	Timestamp int64  `json:"timestamp"`
-	NewValue  string `json:"new_value"`
+// Action holds one action record for an Info
+type Action struct {
+	ByUser     string `json:"by_user"`
+	ActionType string `json:"action_type"`
+	Timestamp  int64  `json:"timestamp"`
+	NewValue   string `json:"new_value"`
 }
 
-// NewEdit returns a new Edit struct
-func NewEdit(EditedBy, NewValue string) *Edit {
+// NewAction returns a new Action struct
+func NewAction(ByUser string, Type ActionType, NewValue string) *Action {
 	var Timestamp = time.Now().UTC().Unix()
 
-	return &Edit{
-		EditedBy:  EditedBy,
-		Timestamp: Timestamp,
-		NewValue:  NewValue,
+	return &Action{
+		ByUser:     ByUser,
+		ActionType: Type.String(),
+		Timestamp:  Timestamp,
+		NewValue:   NewValue,
 	}
+}
+
+type ActionType int
+
+const (
+	ActionUnknown ActionType = iota
+	ActionCreate
+	ActionEdit
+)
+
+var ActionTypeStringMap = map[ActionType]string{
+	ActionUnknown: "unknown",
+	ActionCreate:  "create",
+	ActionEdit:    "edit",
+}
+
+var ActionTypeStringRevMap = map[string]ActionType{
+	"unknown": ActionUnknown,
+	"create":  ActionCreate,
+	"edit":    ActionEdit,
+}
+
+func (a ActionType) String() string {
+	return ActionTypeStringMap[a]
 }
