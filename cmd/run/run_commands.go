@@ -266,11 +266,6 @@ func (b *bot) cmdInfoSet(m chat1.MsgSummary) error {
 		convID   = m.ConvID
 	)
 
-	availableOptions := []string{
-		"nonadmincreate",
-		"nonadminedit",
-		"nonadmindelete",
-	}
 	if !utils.HasMinRole(b.k, "admin", userName, convID) {
 		return fmt.Errorf(errAdminRequiredToEditSettings)
 	}
@@ -282,10 +277,6 @@ func (b *bot) cmdInfoSet(m chat1.MsgSummary) error {
 	}
 
 	option := strings.Fields(msg)[0]
-
-	if !utils.StringInSlice(option, availableOptions) {
-		return fmt.Errorf(errInvalidOption)
-	}
 
 	value := strings.TrimSpace(strings.Replace(msg, option, "", 1))
 	if value == "" {
@@ -299,31 +290,36 @@ func (b *bot) cmdInfoSet(m chat1.MsgSummary) error {
 		return fmt.Errorf(errFetchingTeamSettings)
 	}
 
-	if value != "true" && value != "false" {
-		return fmt.Errorf(errInvalidValue)
-	}
 	switch option {
 	case "nonadmincreate":
-		if value == "true" {
+		switch value {
+		case "true":
 			settings.NonAdminCreate = true
-		}
-		if value == "false" {
+		case "false":
 			settings.NonAdminCreate = false
+		default:
+			return fmt.Errorf(errInvalidValue)
 		}
 	case "nonadminedit":
-		if value == "true" {
+		switch value {
+		case "true":
 			settings.NonAdminEdit = true
-		}
-		if value == "false" {
+		case "false":
 			settings.NonAdminEdit = false
+		default:
+			return fmt.Errorf(errInvalidValue)
 		}
 	case "nonadmindelete":
-		if value == "true" {
+		switch value {
+		case "true":
 			settings.NonAdminDelete = true
-		}
-		if value == "false" {
+		case "false":
 			settings.NonAdminDelete = false
+		default:
+			return fmt.Errorf(errInvalidValue)
 		}
+	default:
+		return fmt.Errorf(errInvalidOption)
 	}
 	err = infobot.WriteTeamSettings(b.k, teamName, settings)
 	if err != nil {
