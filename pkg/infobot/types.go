@@ -11,12 +11,14 @@ var (
 
 // TeamSettings holds the settings for a team
 type TeamSettings struct {
-	NonAdminCreate bool `json:"non_admin_create"`
-	NonAdminEdit   bool `json:"non_admin_edit"`
-	NonAdminDelete bool `json:"non_admin_delete"`
-	//GreetingEnabled bool   `json:"greeting_enabled"`
-	//GreetingChannel string `json:"greeting_channel"`
-	//GreetingKey     string `json:"greeting_key"`
+	// Making the JSON representation of these be CamelCase allows them to be more easily displayed
+	// by the bot in the same form that's expected as input when changing these settings
+	NonAdminCreate bool `json:"NonAdminCreate"`
+	NonAdminEdit   bool `json:"NonAdminEdit"`
+	NonAdminDelete bool `json:"NonAdminDelete"`
+	//GreetingEnabled bool   `json:"GreetingEnabled"`
+	//GreetingChannel string `json:"GreetingChannel"`
+	//GreetingKey     string `json:"GreetingKey"`
 	revision int
 }
 
@@ -37,6 +39,7 @@ func NewTeamSettings() *TeamSettings {
 type Info struct {
 	Key         string   `json:"key"`
 	Value       string   `json:"value"`
+	Locked      bool     `json:"locked"`
 	CreatedBy   string   `json:"created_by"`
 	CreatedTime int64    `json:"created_time"`
 	Actions     []Action `json:"actions"`
@@ -50,6 +53,7 @@ func NewInfo(Key, Value, CreatedBy string) *Info {
 	return &Info{
 		Key:         Key,
 		Value:       Value,
+		Locked:      false,
 		CreatedBy:   CreatedBy,
 		CreatedTime: CreatedTime,
 		Actions: []Action{
@@ -57,7 +61,7 @@ func NewInfo(Key, Value, CreatedBy string) *Info {
 				ByUser:     CreatedBy,
 				ActionType: ActionCreate.String(),
 				Timestamp:  CreatedTime,
-				NewValue:   Value,
+				NewValue:   &Value,
 			},
 		},
 		revision: 0,
@@ -66,14 +70,14 @@ func NewInfo(Key, Value, CreatedBy string) *Info {
 
 // Action holds one action record for an Info
 type Action struct {
-	ByUser     string `json:"by_user"`
-	ActionType string `json:"action_type"`
-	Timestamp  int64  `json:"timestamp"`
-	NewValue   string `json:"new_value"`
+	ByUser     string  `json:"by_user"`
+	ActionType string  `json:"action_type"`
+	Timestamp  int64   `json:"timestamp"`
+	NewValue   *string `json:"new_value"`
 }
 
 // NewAction returns a new Action struct
-func NewAction(ByUser string, Type ActionType, NewValue string) *Action {
+func NewAction(ByUser string, Type ActionType, NewValue *string) *Action {
 	var Timestamp = time.Now().UTC().Unix()
 
 	return &Action{
@@ -90,18 +94,24 @@ const (
 	ActionUnknown ActionType = iota
 	ActionCreate
 	ActionEdit
+	ActionLock
+	ActionUnlock
 )
 
 var ActionTypeStringMap = map[ActionType]string{
 	ActionUnknown: "unknown",
 	ActionCreate:  "create",
 	ActionEdit:    "edit",
+	ActionLock:    "lock",
+	ActionUnlock:  "unlock",
 }
 
 var ActionTypeStringRevMap = map[string]ActionType{
 	"unknown": ActionUnknown,
 	"create":  ActionCreate,
 	"edit":    ActionEdit,
+	"lock":    ActionLock,
+	"unlock":  ActionUnlock,
 }
 
 func (a ActionType) String() string {
