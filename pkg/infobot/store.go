@@ -174,6 +174,42 @@ func WriteInfo(kb *keybase.Keybase, teamName string, info Info) error {
 	return err
 }
 
+// LockKey locks a key in the KVStore
+func LockKey(kb *keybase.Keybase, teamName, key, lockedBy string) error {
+	lock := NewAction(lockedBy, ActionLock, nil)
+	info, err := FetchKey(kb, teamName, key)
+	if err != nil {
+		return err
+	}
+
+	if info.Locked {
+		return fmt.Errorf("key is already locked")
+	}
+
+	info.Actions = append(info.Actions, *lock)
+	info.Locked = true
+
+	return WriteInfo(kb, teamName, info)
+}
+
+// UnlockKey unlocks a key in the KVStore
+func UnlockKey(kb *keybase.Keybase, teamName, key, unlockedBy string) error {
+	unlock := NewAction(unlockedBy, ActionUnlock, nil)
+	info, err := FetchKey(kb, teamName, key)
+	if err != nil {
+		return err
+	}
+
+	if !info.Locked {
+		return fmt.Errorf("key is already unlocked")
+	}
+
+	info.Actions = append(info.Actions, *unlock)
+	info.Locked = false
+
+	return WriteInfo(kb, teamName, info)
+}
+
 // DeleteKey deletes a key from the KVStore
 func DeleteKey(kb *keybase.Keybase, teamName string, info Info) error {
 	var err error

@@ -25,6 +25,16 @@ func (b *bot) advertiseCommands() {
 						Description: "Edit a key",
 					},
 					{
+						Name:        "info lock",
+						Usage:       "<key>",
+						Description: "Lock a key",
+					},
+					{
+						Name:        "info unlock",
+						Usage:       "<key>",
+						Description: "Unlock a key",
+					},
+					{
 						Name:        "info delete",
 						Usage:       "<key>",
 						Description: "Delete a key",

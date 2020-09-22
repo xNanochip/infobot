@@ -27,7 +27,11 @@ const (
 	errFailedWritingSettings       = "failed to write team settings to kvstore"
 	errAdminRequiredToAdd          = "only admins are allowed to add new keys"
 	errAdminRequiredToEdit         = "only admins are allowed to edit keys"
+	errAdminRequiredToEditLocked   = "this key is locked, and can only be edited by an admin"
+	errAdminRequiredToLock         = "Only admins are allowed to lock keys"
+	errAdminRequiredToUnlock       = "Only admins are allowed to unlock keys"
 	errAdminRequiredToDelete       = "only admins are allowed to delete keys"
+	errAdminRequiredToDeleteLocked = "this key is locked, and can only be deleted by an admin"
 	errAdminRequiredToEditSettings = "Only admins are allowed to edit team settings"
 )
 
@@ -101,10 +105,19 @@ func (b *bot) cmdInfoEdit(m chat1.MsgSummary) error {
 		b.logError("Unable to fetch team settings for team %s. -- %v", teamName, err)
 		return fmt.Errorf(errFetchingTeamSettings)
 	}
+
+	// i don't want to check if they're an admin twice, and this makes more sense to check earlier rather than later,
+	// so i'm creating these vars so i know later if i've already checked this
+	var (
+		adminChecked = false
+		isAdmin      = false
+	)
 	if !settings.NonAdminEdit {
+		adminChecked = true
 		if !utils.HasMinRole(b.k, "admin", userName, convID) {
 			return fmt.Errorf(errAdminRequiredToEdit)
 		}
+		isAdmin = true
 	}
 
 	// parse the key and value from the received message
@@ -129,9 +142,126 @@ func (b *bot) cmdInfoEdit(m chat1.MsgSummary) error {
 		return fmt.Errorf(errKeyNotFound)
 	}
 
+	// fetch key info from the team's kvstore
+	info, err := infobot.FetchKey(b.k, teamName, key)
+	if err != nil {
+		b.logError("Unable to fetch key for team %s. -- %v", teamName, err)
+		return fmt.Errorf(errFetchingKey)
+	}
+
+	// handle locked keys
+	if info.Locked && !isAdmin {
+		if adminChecked {
+			return fmt.Errorf(errAdminRequiredToEditLocked)
+		}
+		if !utils.HasMinRole(b.k, "admin", userName, convID) {
+			return fmt.Errorf(errAdminRequiredToEditLocked)
+		}
+	}
+
 	// edit the key
 	err = infobot.EditKey(b.k, teamName, key, userName, value)
 	if err != nil {
+		b.logError("Unable to write new key to team %s. -- %v", teamName, err)
+		return fmt.Errorf(errFailedWritingKey)
+	}
+
+	// react to the command message to let them know it was successful
+	_, err = b.k.ReactByConvID(convID, m.Id, ":heavy_check_mark:")
+	if err != nil {
+		b.logError("Error sending reaction: %v", err)
+	}
+	return nil
+}
+
+func (b *bot) cmdInfoLock(m chat1.MsgSummary) error {
+	var (
+		teamName = m.Channel.Name
+		userName = m.Sender.Username
+		convID   = m.ConvID
+	)
+
+	// only admins can lock keys
+	if !utils.HasMinRole(b.k, "admin", userName, convID) {
+		return fmt.Errorf(errAdminRequiredToLock)
+	}
+
+	// parse the key and value from the received message
+	msg := strings.TrimSpace(strings.Replace(m.Content.Text.Body, "!info lock ", "", 1))
+	if msg == "" {
+		return fmt.Errorf(errMissingKeyValue)
+	}
+
+	key := msg
+
+	// make sure key exists
+	keys, err := infobot.GetKeys(b.k, teamName)
+	if err != nil {
+		b.logError("Unable to fetch keys for team %s. -- %v", teamName, err)
+		return fmt.Errorf(errFetchingKeys)
+	}
+	if !utils.StringInSlice(key, keys) {
+		return fmt.Errorf(errKeyNotFound)
+	}
+
+	// lock the key
+	err = infobot.LockKey(b.k, teamName, key, userName)
+	if err != nil {
+		if err.Error() == "key is already locked" {
+			b.k.ReactByConvID(convID, m.Id, "no change")
+			return nil
+		}
+
+		b.logError("Unable to write new key to team %s. -- %v", teamName, err)
+		return fmt.Errorf(errFailedWritingKey)
+	}
+
+	// react to the command message to let them know it was successful
+	_, err = b.k.ReactByConvID(convID, m.Id, ":heavy_check_mark:")
+	if err != nil {
+		b.logError("Error sending reaction: %v", err)
+	}
+	return nil
+}
+
+func (b *bot) cmdInfoUnlock(m chat1.MsgSummary) error {
+	var (
+		teamName = m.Channel.Name
+		userName = m.Sender.Username
+		convID   = m.ConvID
+	)
+
+	// only admins can unlock keys
+	if !utils.HasMinRole(b.k, "admin", userName, convID) {
+		return fmt.Errorf(errAdminRequiredToUnlock)
+	}
+
+	// parse the key and value from the received message
+	msg := strings.TrimSpace(strings.Replace(m.Content.Text.Body, "!info unlock ", "", 1))
+	if msg == "" {
+		return fmt.Errorf(errMissingKeyValue)
+	}
+
+	key := msg
+
+	// make sure key exists
+	keys, err := infobot.GetKeys(b.k, teamName)
+	if err != nil {
+		b.logError("Unable to fetch keys for team %s. -- %v", teamName, err)
+		return fmt.Errorf(errFetchingKeys)
+	}
+	if !utils.StringInSlice(key, keys) {
+		return fmt.Errorf(errKeyNotFound)
+	}
+
+	// unlock the key
+	err = infobot.UnlockKey(b.k, teamName, key, userName)
+	if err != nil {
+		if err.Error() == "key is already unlocked" {
+			b.k.ReactByConvID(convID, m.Id, "no change")
+			return nil
+		}
+
 		b.logError("Unable to write new key to team %s. -- %v", teamName, err)
 		return fmt.Errorf(errFailedWritingKey)
 	}
@@ -157,10 +287,19 @@ func (b *bot) cmdInfoDelete(m chat1.MsgSummary) error {
 		b.logError("Unable to fetch team settings for team %s. -- %v", teamName, err)
 		return fmt.Errorf(errFetchingTeamSettings)
 	}
+
+	// i don't want to check if they're an admin twice, and this makes more sense to check earlier rather than later,
+	// so i'm creating these vars so i know later if i've already checked this
+	var (
+		adminChecked = false
+		isAdmin      = false
+	)
 	if !settings.NonAdminDelete {
+		adminChecked = true
 		if !utils.HasMinRole(b.k, "admin", userName, convID) {
 			return fmt.Errorf(errAdminRequiredToDelete)
 		}
+		isAdmin = true
 	}
 
 	// parse the key and value from the received message
@@ -186,6 +325,16 @@ func (b *bot) cmdInfoDelete(m chat1.MsgSummary) error {
 	if err != nil {
 		b.logError("Unable to fetch key for team %s. -- %v", teamName, err)
 		return fmt.Errorf(errFetchingKey)
+	}
+
+	// handle locked keys
+	if info.Locked && !isAdmin {
+		if adminChecked {
+			return fmt.Errorf(errAdminRequiredToDeleteLocked)
+		}
+		if !utils.HasMinRole(b.k, "admin", userName, convID) {
+			return fmt.Errorf(errAdminRequiredToDeleteLocked)
+		}
 	}
 
 	// delete key

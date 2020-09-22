@@ -50,6 +50,18 @@ func (b *bot) chatHandler(m chat1.MsgSummary) {
 			}
 			return
 		}
+		if strings.HasPrefix(m.Content.Text.Body, "!info lock ") {
+			if err := b.cmdInfoLock(m); err != nil {
+				b.k.ReplyByConvID(convID, m.Id, "Error: %v", err)
+			}
+			return
+		}
+		if strings.HasPrefix(m.Content.Text.Body, "!info unlock ") {
+			if err := b.cmdInfoUnlock(m); err != nil {
+				b.k.ReplyByConvID(convID, m.Id, "Error: %v", err)
+			}
+			return
+		}
 		if strings.HasPrefix(m.Content.Text.Body, "!info delete ") {
 			if err := b.cmdInfoDelete(m); err != nil {
 				b.k.ReplyByConvID(convID, m.Id, "Error: %v", err)

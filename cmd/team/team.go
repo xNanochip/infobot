@@ -10,6 +10,8 @@ var Command = cli.Command{
 		&teamListKeysCmd,
 		&teamAddKeyCmd,
 		&teamEditKeyCmd,
+		&teamLockKeyCmd,
+		&teamUnlockKeyCmd,
 		&teamReadKeyCmd,
 		&teamDeleteKeyCmd,
 		&teamAuditKeyCmd,
