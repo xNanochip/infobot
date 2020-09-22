@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"samhofi.us/x/infobot/cmd/run"
+	"samhofi.us/x/infobot/cmd/team"
 
 	"github.com/urfave/cli/v2"
 )
@@ -43,6 +44,7 @@ func Run(args []string, stdout io.Writer) error {
 
 	app.Commands = []*cli.Command{
 		&run.Command,
+		&team.Command,
 	}
 
 	if err := app.Run(args); err != nil {
