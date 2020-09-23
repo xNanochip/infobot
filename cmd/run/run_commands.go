@@ -551,8 +551,9 @@ func (b *bot) cmdAtMention(m chat1.MsgSummary) error {
 	// fetch key info from the team's kvstore
 	info, err := infobot.FetchKey(b.k, teamName, key)
 	if err != nil {
+		// log error, but do not send error message to channel
 		b.logError("Unable to fetch key for team %s. -- %v", teamName, err)
-		return fmt.Errorf(errFetchingKey)
+		return nil
 	}
 	_, err = b.k.SendMessageByConvID(convID, info.Value)
 	if err != nil {
