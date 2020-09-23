@@ -43,7 +43,7 @@ func teamUnlockKey(c *cli.Context) (err error) {
 	}
 
 	// unlock the key
-	err = infobot.UnlockKey(kb, teamName, key, "[cli]")
+	err = infobot.UnlockKey(kb, teamName, key, kb.Username+" via cli")
 	if err != nil {
 		if err.Error() == "key is already unlocked" {
 			fmt.Fprintf(c.App.Writer, "Key is already unlocked, no changes made\n")

@@ -47,7 +47,7 @@ func teamEditKey(c *cli.Context) (err error) {
 	}
 
 	// edit the key
-	err = infobot.EditKey(kb, teamName, key, "[cli]", value)
+	err = infobot.EditKey(kb, teamName, key, kb.Username+" (via cli)", value)
 	if err != nil {
 		return fmt.Errorf("Error: Unable to write new key to team -- %v", err)
 	}

@@ -43,7 +43,7 @@ func teamLockKey(c *cli.Context) (err error) {
 	}
 
 	// lock the key
-	err = infobot.LockKey(kb, teamName, key, "[cli]")
+	err = infobot.LockKey(kb, teamName, key, kb.Username+" via cli")
 	if err != nil {
 		if err.Error() == "key is already locked" {
 			fmt.Fprintf(c.App.Writer, "Key is already locked, no changes made\n")

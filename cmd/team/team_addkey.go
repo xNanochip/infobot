@@ -47,7 +47,7 @@ func teamAddKey(c *cli.Context) (err error) {
 	}
 
 	// create a new Info and write it to the team's kvstore
-	info := infobot.NewInfo(key, value, "[cli]")
+	info := infobot.NewInfo(key, value, kb.Username+" via cli")
 	err = infobot.WriteInfo(kb, teamName, *info)
 	if err != nil {
 		return fmt.Errorf("Error: Unable to write new key to team -- %v", err)
