@@ -160,6 +160,12 @@ func (b *bot) cmdInfoEdit(m chat1.MsgSummary) error {
 		return fmt.Errorf(errFetchingKey)
 	}
 
+	// if the given value matches the existing value, there's nothing to do
+	if info.Value == value {
+		b.k.ReactByConvID(convID, m.Id, "no change")
+		return nil
+	}
+
 	// handle locked keys
 	if info.Locked && !isAdmin {
 		if adminChecked {
