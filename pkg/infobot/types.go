@@ -58,10 +58,10 @@ func NewInfo(Key, Value, CreatedBy string) *Info {
 		CreatedTime: CreatedTime,
 		Actions: []Action{
 			{
-				ByUser:     CreatedBy,
+				User:       CreatedBy,
 				ActionType: ActionCreate.String(),
 				Timestamp:  CreatedTime,
-				NewValue:   &Value,
+				Value:      &Value,
 			},
 		},
 		revision: 0,
@@ -70,21 +70,21 @@ func NewInfo(Key, Value, CreatedBy string) *Info {
 
 // Action holds one action record for an Info
 type Action struct {
-	ByUser     string  `json:"by_user"`
+	User       string  `json:"user"`
 	ActionType string  `json:"action_type"`
 	Timestamp  int64   `json:"timestamp"`
-	NewValue   *string `json:"new_value"`
+	Value      *string `json:"value"`
 }
 
 // NewAction returns a new Action struct
-func NewAction(ByUser string, Type ActionType, NewValue *string) *Action {
+func NewAction(User string, Type ActionType, Value *string) *Action {
 	var Timestamp = time.Now().UTC().Unix()
 
 	return &Action{
-		ByUser:     ByUser,
+		User:       User,
 		ActionType: Type.String(),
 		Timestamp:  Timestamp,
-		NewValue:   NewValue,
+		Value:      Value,
 	}
 }
 
