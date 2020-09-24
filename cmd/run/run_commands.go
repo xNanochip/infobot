@@ -6,6 +6,7 @@ import (
 
 	"samhofi.us/x/infobot/pkg/infobot"
 	"samhofi.us/x/infobot/pkg/utils"
+	"samhofi.us/x/keybase/v2"
 	"samhofi.us/x/keybase/v2/types/chat1"
 )
 
@@ -41,6 +42,11 @@ func (b *bot) cmdInfoAdd(m chat1.MsgSummary) error {
 		userName = m.Sender.Username
 		convID   = m.ConvID
 	)
+
+	// this is needed in case a user adds the bot to their own conversation with themself
+	if m.Channel.MembersType == keybase.USER && !strings.Contains(teamName, ",") {
+		teamName = teamName + "," + teamName
+	}
 
 	// fetch team's settings for the bot
 	settings, err := infobot.FetchTeamSettings(b.k, teamName)
@@ -98,6 +104,11 @@ func (b *bot) cmdInfoEdit(m chat1.MsgSummary) error {
 		userName = m.Sender.Username
 		convID   = m.ConvID
 	)
+
+	// this is needed in case a user adds the bot to their own conversation with themself
+	if m.Channel.MembersType == keybase.USER && !strings.Contains(teamName, ",") {
+		teamName = teamName + "," + teamName
+	}
 
 	// fetch team's settings for the bot
 	settings, err := infobot.FetchTeamSettings(b.k, teamName)
@@ -181,6 +192,11 @@ func (b *bot) cmdInfoLock(m chat1.MsgSummary) error {
 		convID   = m.ConvID
 	)
 
+	// this is needed in case a user adds the bot to their own conversation with themself
+	if m.Channel.MembersType == keybase.USER && !strings.Contains(teamName, ",") {
+		teamName = teamName + "," + teamName
+	}
+
 	// only admins can lock keys
 	if !utils.HasMinRole(b.k, "admin", userName, convID) {
 		return fmt.Errorf(errAdminRequiredToLock)
@@ -231,6 +247,11 @@ func (b *bot) cmdInfoUnlock(m chat1.MsgSummary) error {
 		convID   = m.ConvID
 	)
 
+	// this is needed in case a user adds the bot to their own conversation with themself
+	if m.Channel.MembersType == keybase.USER && !strings.Contains(teamName, ",") {
+		teamName = teamName + "," + teamName
+	}
+
 	// only admins can unlock keys
 	if !utils.HasMinRole(b.k, "admin", userName, convID) {
 		return fmt.Errorf(errAdminRequiredToUnlock)
@@ -280,6 +301,11 @@ func (b *bot) cmdInfoDelete(m chat1.MsgSummary) error {
 		userName = m.Sender.Username
 		convID   = m.ConvID
 	)
+
+	// this is needed in case a user adds the bot to their own conversation with themself
+	if m.Channel.MembersType == keybase.USER && !strings.Contains(teamName, ",") {
+		teamName = teamName + "," + teamName
+	}
 
 	// fetch team's settings for the bot
 	settings, err := infobot.FetchTeamSettings(b.k, teamName)
@@ -359,6 +385,11 @@ func (b *bot) cmdInfoRead(m chat1.MsgSummary) error {
 		convID   = m.ConvID
 	)
 
+	// this is needed in case a user adds the bot to their own conversation with themself
+	if m.Channel.MembersType == keybase.USER && !strings.Contains(teamName, ",") {
+		teamName = teamName + "," + teamName
+	}
+
 	// parse the key from the received message
 	msg := strings.TrimSpace(strings.Replace(m.Content.Text.Body, "!info read ", "", 1))
 	if msg == "" {
@@ -387,6 +418,11 @@ func (b *bot) cmdInfoAudit(m chat1.MsgSummary) error {
 		convID   = m.ConvID
 	)
 
+	// this is needed in case a user adds the bot to their own conversation with themself
+	if m.Channel.MembersType == keybase.USER && !strings.Contains(teamName, ",") {
+		teamName = teamName + "," + teamName
+	}
+
 	msg := strings.TrimSpace(strings.Replace(m.Content.Text.Body, "!info audit ", "", 1))
 	if msg == "" {
 		return fmt.Errorf(errMissingKey)
@@ -414,6 +450,11 @@ func (b *bot) cmdInfoSet(m chat1.MsgSummary) error {
 		userName = m.Sender.Username
 		convID   = m.ConvID
 	)
+
+	// this is needed in case a user adds the bot to their own conversation with themself
+	if m.Channel.MembersType == keybase.USER && !strings.Contains(teamName, ",") {
+		teamName = teamName + "," + teamName
+	}
 
 	if !utils.HasMinRole(b.k, "admin", userName, convID) {
 		return fmt.Errorf(errAdminRequiredToEditSettings)
@@ -489,6 +530,12 @@ func (b *bot) cmdInfoSettings(m chat1.MsgSummary) error {
 		teamName = m.Channel.Name
 		convID   = m.ConvID
 	)
+
+	// this is needed in case a user adds the bot to their own conversation with themself
+	if m.Channel.MembersType == keybase.USER && !strings.Contains(teamName, ",") {
+		teamName = teamName + "," + teamName
+	}
+
 	// fetch key info from the team's kvstore
 	settings, err := infobot.FetchTeamSettings(b.k, teamName)
 	if err != nil {
@@ -509,6 +556,11 @@ func (b *bot) cmdInfoKeys(m chat1.MsgSummary) error {
 		teamName = m.Channel.Name
 		convID   = m.ConvID
 	)
+
+	// this is needed in case a user adds the bot to their own conversation with themself
+	if m.Channel.MembersType == keybase.USER && !strings.Contains(teamName, ",") {
+		teamName = teamName + "," + teamName
+	}
 
 	// fetch key info from the team's kvstore
 	keys, err := infobot.GetKeys(b.k, teamName)
@@ -538,6 +590,11 @@ func (b *bot) cmdAtMention(m chat1.MsgSummary) error {
 		teamName = m.Channel.Name
 		convID   = m.ConvID
 	)
+
+	// this is needed in case a user adds the bot to their own conversation with themself
+	if m.Channel.MembersType == keybase.USER && !strings.Contains(teamName, ",") {
+		teamName = teamName + "," + teamName
+	}
 
 	key := strings.TrimSpace(strings.ReplaceAll(m.Content.Text.Body, fmt.Sprintf("@%s", b.k.Username), ""))
 	if key == "" {
