@@ -239,6 +239,20 @@ func EditKey(kb *keybase.Keybase, teamName, key, editedBy, newValue string) erro
 	return WriteInfo(kb, teamName, info)
 }
 
+// AppendKey appends a line to an existing key and saves it to a team
+func AppendKey(kb *keybase.Keybase, teamName, key, editedBy, newLine string) error {
+	edit := NewAction(editedBy, ActionAppend, &newLine)
+	info, err := FetchKey(kb, teamName, key)
+	if err != nil {
+		return err
+	}
+
+	info.Actions = append(info.Actions, *edit)
+	info.Value = fmt.Sprintf("%s\n%s", info.Value, newLine)
+
+	return WriteInfo(kb, teamName, info)
+}
+
 func cleanPercents(s string) string {
 	return strings.Replace(s, "%", "%%", -1)
 }

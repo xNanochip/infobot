@@ -25,6 +25,11 @@ func (b *bot) advertiseCommands() {
 						Description: "Edit a key",
 					},
 					{
+						Name:        "info append",
+						Usage:       "<key> <new line>",
+						Description: "Append a new line to a key",
+					},
+					{
 						Name:        "info lock",
 						Usage:       "<key>",
 						Description: "Lock a key",

@@ -191,6 +191,93 @@ func (b *bot) cmdInfoEdit(m chat1.MsgSummary) error {
 	return nil
 }
 
+func (b *bot) cmdInfoAppend(m chat1.MsgSummary) error {
+	var (
+		teamName = m.Channel.Name
+		userName = m.Sender.Username
+		convID   = m.ConvID
+	)
+
+	// this is needed in case a user adds the bot to their own conversation with themself
+	if m.Channel.MembersType == keybase.USER && !strings.Contains(teamName, ",") {
+		teamName = teamName + "," + teamName
+	}
+
+	// fetch team's settings for the bot
+	settings, err := infobot.FetchTeamSettings(b.k, teamName)
+	if err != nil {
+		b.logError("Unable to fetch team settings for team %s. -- %v", teamName, err)
+		return fmt.Errorf(errFetchingTeamSettings)
+	}
+
+	// i don't want to check if they're an admin twice, and this makes more sense to check earlier rather than later,
+	// so i'm creating these vars so i know later if i've already checked this
+	var (
+		adminChecked = false
+		isAdmin      = false
+	)
+	if !settings.NonAdminEdit {
+		adminChecked = true
+		if !utils.HasMinRole(b.k, "admin", userName, convID) {
+			return fmt.Errorf(errAdminRequiredToEdit)
+		}
+		isAdmin = true
+	}
+
+	// parse the key and value from the received message
+	msg := strings.TrimSpace(strings.Replace(m.Content.Text.Body, "!info append ", "", 1))
+	if msg == "" {
+		return fmt.Errorf(errMissingKeyValue)
+	}
+
+	key := strings.Fields(msg)[0]
+	value := strings.TrimSpace(strings.Replace(msg, key, "", 1))
+	if value == "" {
+		return fmt.Errorf(errMissingValue)
+	}
+
+	// make sure key exists
+	keys, err := infobot.GetKeys(b.k, teamName)
+	if err != nil {
+		b.logError("Unable to fetch keys for team %s. -- %v", teamName, err)
+		return fmt.Errorf(errFetchingKeys)
+	}
+	if !utils.StringInSlice(key, keys) {
+		return fmt.Errorf(errKeyNotFound)
+	}
+
+	// fetch key info from the team's kvstore
+	info, err := infobot.FetchKey(b.k, teamName, key)
+	if err != nil {
+		b.logError("Unable to fetch key for team %s. -- %v", teamName, err)
+		return fmt.Errorf(errFetchingKey)
+	}
+
+	// handle locked keys
+	if info.Locked && !isAdmin {
+		if adminChecked {
+			return fmt.Errorf(errAdminRequiredToEditLocked)
+		}
+		if !utils.HasMinRole(b.k, "admin", userName, convID) {
+			return fmt.Errorf(errAdminRequiredToEditLocked)
+		}
+	}
+
+	// append to the key
+	err = infobot.AppendKey(b.k, teamName, key, userName, value)
+	if err != nil {
+		b.logError("Unable to write new key to team %s. -- %v", teamName, err)
+		return fmt.Errorf(errFailedWritingKey)
+	}
+
+	// react to the command message to let them know it was successful
+	_, err = b.k.ReactByConvID(convID, m.Id, ":heavy_check_mark:")
+	if err != nil {
+		b.logError("Error sending reaction: %v", err)
+	}
+	return nil
+}
+
 func (b *bot) cmdInfoLock(m chat1.MsgSummary) error {
 	var (
 		teamName = m.Channel.Name

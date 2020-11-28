@@ -94,6 +94,7 @@ const (
 	ActionUnknown ActionType = iota
 	ActionCreate
 	ActionEdit
+	ActionAppend
 	ActionLock
 	ActionUnlock
 )
@@ -102,6 +103,7 @@ var ActionTypeStringMap = map[ActionType]string{
 	ActionUnknown: "unknown",
 	ActionCreate:  "create",
 	ActionEdit:    "edit",
+	ActionAppend:  "append",
 	ActionLock:    "lock",
 	ActionUnlock:  "unlock",
 }
@@ -110,6 +112,7 @@ var ActionTypeStringRevMap = map[string]ActionType{
 	"unknown": ActionUnknown,
 	"create":  ActionCreate,
 	"edit":    ActionEdit,
+	"append":  ActionAppend,
 	"lock":    ActionLock,
 	"unlock":  ActionUnlock,
 }
