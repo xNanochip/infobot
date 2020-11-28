@@ -710,7 +710,7 @@ func (b *bot) cmdAtMention(m chat1.MsgSummary) error {
 	// the leading space gets stripped by the client when it displays the message.
 	_, err = b.k.SendMessageByConvID(convID, " %s", info.Value)
 	if err != nil {
-		b.logError("Error sending reply: %v", err)
+		b.logError("Error sending message: %v", err)
 	}
 
 	return nil
