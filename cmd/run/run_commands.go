@@ -705,7 +705,10 @@ func (b *bot) cmdAtMention(m chat1.MsgSummary) error {
 		b.logError("Unable to fetch key for team %s. -- %v", teamName, err)
 		return nil
 	}
-	_, err = b.k.SendMessageByConvID(convID, info.Value)
+
+	// send key's value with a leading space to prevent slash commands (e.g. /flip) from being interpreted by the keybase client.
+	// the leading space gets stripped by the client when it displays the message.
+	_, err = b.k.SendMessageByConvID(convID, " %s", info.Value)
 	if err != nil {
 		b.logError("Error sending reply: %v", err)
 	}
