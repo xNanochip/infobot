@@ -3,6 +3,7 @@ package run
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"samhofi.us/x/infobot/pkg/infobot"
 	"samhofi.us/x/infobot/pkg/utils"
@@ -61,7 +62,7 @@ func (b *bot) cmdInfoAdd(m chat1.MsgSummary) error {
 	}
 
 	// parse the key and value from the received message
-	msg := strings.TrimSpace(strings.Replace(m.Content.Text.Body, "!info add ", "", 1))
+	msg := strings.TrimSpace(strings.Replace(m.Content.Text.Body, "!pwd add ", "", 1))
 	if msg == "" {
 		return fmt.Errorf(errMissingKeyValue)
 	}
@@ -132,7 +133,7 @@ func (b *bot) cmdInfoEdit(m chat1.MsgSummary) error {
 	}
 
 	// parse the key and value from the received message
-	msg := strings.TrimSpace(strings.Replace(m.Content.Text.Body, "!info edit ", "", 1))
+	msg := strings.TrimSpace(strings.Replace(m.Content.Text.Body, "!pwd edit ", "", 1))
 	if msg == "" {
 		return fmt.Errorf(errMissingKeyValue)
 	}
@@ -225,7 +226,7 @@ func (b *bot) cmdInfoAppend(m chat1.MsgSummary) error {
 	}
 
 	// parse the key and value from the received message
-	msg := strings.TrimSpace(strings.Replace(m.Content.Text.Body, "!info append ", "", 1))
+	msg := strings.TrimSpace(strings.Replace(m.Content.Text.Body, "!pwd append ", "", 1))
 	if msg == "" {
 		return fmt.Errorf(errMissingKeyValue)
 	}
@@ -296,7 +297,7 @@ func (b *bot) cmdInfoLock(m chat1.MsgSummary) error {
 	}
 
 	// parse the key and value from the received message
-	msg := strings.TrimSpace(strings.Replace(m.Content.Text.Body, "!info lock ", "", 1))
+	msg := strings.TrimSpace(strings.Replace(m.Content.Text.Body, "!pwd lock ", "", 1))
 	if msg == "" {
 		return fmt.Errorf(errMissingKeyValue)
 	}
@@ -351,7 +352,7 @@ func (b *bot) cmdInfoUnlock(m chat1.MsgSummary) error {
 	}
 
 	// parse the key and value from the received message
-	msg := strings.TrimSpace(strings.Replace(m.Content.Text.Body, "!info unlock ", "", 1))
+	msg := strings.TrimSpace(strings.Replace(m.Content.Text.Body, "!pwd unlock ", "", 1))
 	if msg == "" {
 		return fmt.Errorf(errMissingKeyValue)
 	}
@@ -422,7 +423,7 @@ func (b *bot) cmdInfoDelete(m chat1.MsgSummary) error {
 	}
 
 	// parse the key and value from the received message
-	msg := strings.TrimSpace(strings.Replace(m.Content.Text.Body, "!info delete ", "", 1))
+	msg := strings.TrimSpace(strings.Replace(m.Content.Text.Body, "!pwd delete ", "", 1))
 	if msg == "" {
 		return fmt.Errorf(errMissingKey)
 	}
@@ -484,7 +485,7 @@ func (b *bot) cmdInfoRead(m chat1.MsgSummary) error {
 	}
 
 	// parse the key from the received message
-	msg := strings.TrimSpace(strings.Replace(m.Content.Text.Body, "!info read ", "", 1))
+	msg := strings.TrimSpace(strings.Replace(m.Content.Text.Body, "!pwd read ", "", 1))
 	if msg == "" {
 		return fmt.Errorf(errMissingKey)
 	}
@@ -516,7 +517,7 @@ func (b *bot) cmdInfoAudit(m chat1.MsgSummary) error {
 		teamName = teamName + "," + teamName
 	}
 
-	msg := strings.TrimSpace(strings.Replace(m.Content.Text.Body, "!info audit ", "", 1))
+	msg := strings.TrimSpace(strings.Replace(m.Content.Text.Body, "!pwd audit ", "", 1))
 	if msg == "" {
 		return fmt.Errorf(errMissingKey)
 	}
@@ -554,7 +555,7 @@ func (b *bot) cmdInfoSet(m chat1.MsgSummary) error {
 	}
 
 	// parse the option and value from the received message
-	msg := strings.ToLower(strings.TrimSpace(strings.Replace(m.Content.Text.Body, "!info set ", "", 1)))
+	msg := strings.ToLower(strings.TrimSpace(strings.Replace(m.Content.Text.Body, "!pwd set ", "", 1)))
 	if msg == "" {
 		return fmt.Errorf(errMissingOptionValue)
 	}
@@ -706,9 +707,11 @@ func (b *bot) cmdAtMention(m chat1.MsgSummary) error {
 		return nil
 	}
 
+	dur, _ := time.ParseDuration("10s")
+
 	// send key's value with a leading space to prevent slash commands (e.g. /flip) from being interpreted by the keybase client.
 	// the leading space gets stripped by the client when it displays the message.
-	_, err = b.k.SendMessageByConvID(convID, " %s", info.Value)
+	_, err = b.k.SendEphemeralByConvID(convID, dur, " `%s`", info.Value)
 	if err != nil {
 		b.logError("Error sending message: %v", err)
 	}
